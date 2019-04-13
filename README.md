@@ -1,4 +1,59 @@
+### Individual Submission
+Name : Rawan Mahmoud Mahmed Gamal El-din
+E-mail: rawan.gamaleldin@gmail.com
+
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+
+The project is built using ROS nodes that communicate with each other using ros-topics as shown in the following figure:
+
+
+### Project requirements
+This projects requires the car to move in the middle lane and stop at the red lights using detection and classification mechanisms, then moves again in the same lane when the traffic is green.
+The acceleration of the car should not exceed 10 m/s^2, and the jerk should not exceed 10 m/s^2.
+
+Lets talk briefly about the important parts of the project:
+
+#### Waypoint Updater
+This ros node is responsible for giving the simulator a list of points (Trajectory) for the next T seconds so that the car can follow.
+I used 80 lookahead points.
+This node is responsible for the acceleration and the deceleration of the car.
+It accelerates as long as there is no red or yellow traffic in front of it, and decelerates otherwise.
+It subscribes to the base way points to follow the basic way points of the road for the mid lane.
+It also subscribes to the traffic waypoint to know the location of the traffic sign and its state to determine wheter the car will accelerate or decelerate.
+
+#### Waypoint Loader
+This ros node runs only once and it is responsible for genrating the way points for the whole road.
+I used it also to set the maximum speed of the car to approximately 10MPH.
+
+#### DBW node
+Drive by wire node is responsible for giving commands to the car so that it makes sure that the car follows the trajectory.
+Those commads are:
+ - Road Wheel angle
+ - Acceleration (Throttle)
+ - Deceleration (Brake)
+ It publishes new commands in 50HZ
+ 
+#### Twist constroller
+A PID controller that controls the throttle of the car. I used the P,I, and D configurations used in the PID project which are:
+- P ==> 0.3
+- I ==> 0.1
+- D ==> 0.001
+
+I also set the maximum acceleration of the car to be 0.4.
+The car fully stops if we apply a force of 400 N*m
+
+#### Traffic light detector
+The most difficult problem in this project is to detect the traffic signs.
+This module sends the images to the classification module to get the state of the light.
+For the sake of speed, I only send the images to the classification module only when we are close to the place of the traffic by 70 way points.
+As a recovery mechanism, when the classification module sends UNKOWN traffic state, it considers it as a red state.
+
+
+#### Traffic sign detection and classification
+I used open-cv to detect the traffic signs and its colors which is very fast compared to the tensor flow API when you do not have access to a very powerful machine with a good GPU.
+
+I used computer-vision Iwith the threshold values to get the red, yellow and green pixels in the traffic so that I can know if it is red, yellow or green sign.
+I can classify the images with a very high acuracy.
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
@@ -39,7 +94,7 @@ To set up port forwarding, please refer to the [instructions from term 2](https:
 
 1. Clone the project repository
 ```bash
-git clone https://github.com/udacity/CarND-Capstone.git
+git clone https://github.com/ahmedmbakr/CarND-Capstone.git
 ```
 
 2. Install python dependencies
